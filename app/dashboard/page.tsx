@@ -5,13 +5,13 @@ import {emergenciesList} from '@/mocks/emergency';
 
 // Components
 import EmergencyCard from '@/components/EmergencyCard';
-import SettingsMenu from '@/components/SettingsMenu';
+//import SettingsMenu from '@/components/SettingsMenu';
 
 export default function Dashboard() {
 	return (
 		<main className="min-h-screen bg-white p-4 flex">
 			{/* Header */}
-			<SettingsMenu />
+			{/* <SettingsMenu /> */}
 
 			{/* Main Content */}
       <div className='w-1/6 container'></div>
