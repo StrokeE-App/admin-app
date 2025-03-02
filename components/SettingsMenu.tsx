@@ -32,7 +32,7 @@ export default function SettingsMenu() {
 				{/* Panel Header */}
 				<div className="relative bg-customRed text-white p-6">
 					<h2 className="text-2xl font-medium">Hola,</h2>
-					<p className="text-2xl font-black">Administrador!</p>
+					<p className="text-2xl font-black">Admin!</p>
 				</div>
 
         {/* Panel Body */}

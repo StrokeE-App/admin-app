@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/Button";
 import { X } from "lucide-react";
 import { useState } from "react";
 
@@ -15,9 +16,9 @@ const initialUsers = [
   { id: "3", fullName: "Doctor", email: "doctor@gmail.com", role: "doctor" },
   {
     id: "4",
-    fullName: "Paramédico",
-    email: "paramedico@gmail.com",
-    role: "paramédico",
+    fullName: "Administrador",
+    email: "admin@gmail.com",
+    role: "administrator",
   },
 ];
 
@@ -37,10 +38,20 @@ export default function UsersPage() {
 
   return (
     <div className="min-h-screen bg-white p-4 flex">
-      <div className='w-1/6 container'></div>
+      <div className="w-1/5 container"></div>
       <div className="mt-20 container mx-auto py-10 px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Usuarios</h1>
-
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">Usuarios</h1>
+          <div className="w-1/5">
+            <Button
+              title="Agregar"
+              color="green"
+              onClick={() => {
+                console.log("Add user");
+              }}
+            />
+          </div>
+        </div>
         <div className="w-10/12 overflow-x-auto">
           <table className="w-full border-collapse">
             {/* Table Header */}
