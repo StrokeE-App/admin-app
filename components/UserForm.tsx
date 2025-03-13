@@ -10,6 +10,7 @@ export function UserForm() {
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
   const [rol, setRol] = useState('');
+  const [plate, setPlate] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -35,18 +36,18 @@ export function UserForm() {
 					<input
 						type="text"
 						placeholder="Apellido"
-						value={userName}
-						onChange={(e) => setUserName(e.target.value)}
+						value={userLastName}
+						onChange={(e) => setUserLastName(e.target.value)}
 						className="w-full px-4 py-3 rounded-full border border-gray-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-customRed focus:border-transparent"
 						required
 					/>
 				</div>
         <div>
 					<input
-						type="text"
+						type="email"
 						placeholder="Email"
-						value={userName}
-						onChange={(e) => setUserName(e.target.value)}
+						value={userEmail}
+						onChange={(e) => setUserEmail(e.target.value)}
 						className="w-full px-4 py-3 rounded-full border border-gray-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-customRed focus:border-transparent"
 						required
 					/>
@@ -55,8 +56,8 @@ export function UserForm() {
 					<input
 						type="password"
 						placeholder="Contraseña"
-						value={userName}
-						onChange={(e) => setUserName(e.target.value)}
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
 						className="w-full px-4 py-3 rounded-full border border-gray-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-customRed focus:border-transparent"
 						required
 					/>
@@ -65,8 +66,8 @@ export function UserForm() {
 					<input
 						type="password"
 						placeholder="Confirmar Contraseña"
-						value={userName}
-						onChange={(e) => setUserName(e.target.value)}
+						value={confirmPassword}
+						onChange={(e) => setConfirmPassword(e.target.value)}
 						className="w-full px-4 py-3 rounded-full border border-gray-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-customRed focus:border-transparent"
 						required
 					/>
@@ -75,24 +76,36 @@ export function UserForm() {
 					<select
             id= "role"
             name='roles'
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
+						value={rol}
+						onChange={(e) => setRol(e.target.value)}
 						className="w-full px-4 py-3 rounded-full border border-gray-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-customRed focus:border-transparent"
 						required
 					>
-            <option value="opcion1">Opción 1</option>
-            <option value="opcion2">Opción 2</option>
-            <option value="opcion3">Opción 3</option>
-            
+            <option value="patient">Paciente</option>
+            <option value="operator">Operador</option>
+            <option value="ambulance">Ambulancia</option>
+            <option value="clinic">Clinica</option>            
           </select>
 				</div>
+        <div>
+          {rol === 'ambulance' && (
+            <input
+              type="text"
+              placeholder="Matricula"
+              value={plate}
+              onChange={(e) => setPlate(e.target.value)}
+              className="w-full px-4 py-3 rounded-full border border-gray-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-customRed focus:border-transparent"
+              required  
+            />
+          )}
+        </div>
 			</div>
 			<button
 				type="submit"
 				disabled={isLoading}
 				className="w-full px-4 py-3 text-white bg-customRed rounded-full hover:bg-gustomRed focus:outline-none focus:ring-2 focus:ring-customRed focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 			>
-				{isLoading ? 'Cargando...' : 'Iniciar Sesión'}
+				{isLoading ? 'Cargando...' : 'Crear Usuario'}
 			</button>
 		</form>
 	);
