@@ -27,6 +27,10 @@ export default function SettingsMenu() {
 				className='fixed top-0 left-0 h-full w-1/6 bg-white transform transition-transform duration-300 ease-in-out z-40 translate-x-0'
 			>
 				{/* Panel Header */}
+        <div className="relative bg-customRed text-white p-6">
+        <h2 className="text-2xl font-medium">Hola,</h2>
+        <p className="text-2xl font-black">Admin!</p>
+      </div>
 				<MenuInformation />
 			</div>
 		</>

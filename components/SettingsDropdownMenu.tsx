@@ -3,7 +3,7 @@
 import {useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {SignOut} from '@/firebase/config';
-import { Menu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import MenuInformation from './MenuInformation';
 
 export default function SettingsDropdownMenu() {
@@ -38,6 +38,14 @@ export default function SettingsDropdownMenu() {
 				}`}
 			>
 				{/* Panel Header */}
+        <div className="relative bg-customRed text-white p-6">
+        <h2 className="text-2xl font-medium">Hola,</h2>
+        <p className="text-2xl font-black">Admin!</p>
+        <X
+          onClick={() => setIsOpen(false)}
+          className="absolute top-6 right-6 w-6 h-6 cursor-pointer"
+        />
+      </div>
 				<MenuInformation />
 			</div>
 		</>
