@@ -39,8 +39,9 @@ export default function AmbulancePage() {
     const fetchAmbulances = async () => {
       try {
         setLoading(true);
-        const response = await apiClient.get("/ambulances/all");
+        const response = await apiClient.get("/ambulance/all");
         setambulances(response.data.ambulances);
+        console.log(response.data.ambulances);
         toast.success('Ambulancias cargadas.', {id: loadingToast});
       } catch (error) {
         console.error("Error fetching ambulances:", error);
@@ -53,8 +54,16 @@ export default function AmbulancePage() {
     fetchAmbulances();
   },[user]);
 
-  const handleDelete = (ambulanceId: string) => {
-    setambulances(ambulances.filter((ambulance) => ambulance.ambulanceId !== ambulanceId));
+  const handleDelete = async (ambulanceId: string) => {
+    const loadingToast = toast.loading('Eliminando Ambulancia...');
+    try {
+      await apiClient.delete(`/ambulance/delete/${ambulanceId}`);
+      toast.success('Ambulancia Eliminada exitosamente.', {id: loadingToast});
+      setambulances(ambulances.filter((ambulance) => ambulance.ambulanceId !== ambulanceId));
+    } catch (error) {
+      console.error("Error fetching ambulances:", error);
+      toast.error('Error al eliminar la ambulancia.', {id: loadingToast});
+    }
   };
 
   if (loading) {
@@ -76,7 +85,7 @@ export default function AmbulancePage() {
               <Button
                 title="Agregar"
                 color="green"
-                onClick={() =>router.push("ambulances/createAmbulance")}
+                onClick={() =>router.push("ambulance/createAmbulance")}
               />
             </div>
           </div>
@@ -88,7 +97,6 @@ export default function AmbulancePage() {
                   <th className="text-left py-3 px-4 font-medium">
                     Id
                   </th>
-                  <th className="text-left py-3 px-4 font-medium">status</th>
                   <th className="text-left py-3 px-4 font-medium">eliminar</th>
                 </tr>
               </thead>
@@ -101,7 +109,6 @@ export default function AmbulancePage() {
                     className="border-b hover:bg-gray-50 transition-colors"
                   >
                     <td className="py-3 px-4">{ambulance.ambulanceId}</td>
-                    <td className="py-3 px-4">{ambulance.status}</td>
                     <td className="py-3 px-4">
                       <button
                         onClick={() => handleDelete(ambulance.ambulanceId)}
