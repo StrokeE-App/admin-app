@@ -2,8 +2,9 @@
 
 import apiClient from "@/api/api";
 import Button from "@/components/Button";
+import ConfirmModal from "@/components/ConfirmModal";
 import { useAuth } from "@/context/AuthContext";
-import { X } from "lucide-react";
+import { Edit, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -20,12 +21,15 @@ interface User {
 export default function UsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState(""); // Estado para el título dinámico
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
     if (!user) return;
-    const loadingToast = toast.loading("Cargando Ambulancias...");
+    const loadingToast = toast.loading("Cargando Usuarios...");
     const fetchAmbulances = async () => {
       try {
         setLoading(true);
@@ -34,7 +38,7 @@ export default function UsersPage() {
         console.log(response.data.users);
         toast.success("Usuarios cargados correctamente.", { id: loadingToast });
       } catch (error) {
-        console.error("Error fetching ambulances:", error);
+        console.error("Error fetching users:", error);
         toast.error("Error al cargar los usuarios.", { id: loadingToast });
       } finally {
         setLoading(false);
@@ -44,25 +48,42 @@ export default function UsersPage() {
     fetchAmbulances();
   }, [user]);
 
-  const handleDelete = async(userId: string, userRol:string) => {
-    const loadingToast = toast.loading('Eliminando Ambulancia...');
+  const openModal = (title: string, user:User) => {
+    setModalTitle(title); // Establece el título dinámico
+    setUserToDelete(user); // Establece el tipo de acción
+    setIsModalOpen(true); // Abre el modal
+  };
+
+  const handleDelete = async (userId: string, userRol: string) => {
+    let formatedRol = userRol === 'clinic' ? 'healthCenter' : userRol;
+    const loadingToast = toast.loading('Eliminando Usuario...');
     try {
-      await apiClient.delete(`/${userRol}/delete/${userId}`);
-      toast.success('Usuario eliminado exitosamente.', {id: loadingToast});
+      await apiClient.delete(`/${formatedRol}/delete/${userId}`);
+      toast.success('Usuario eliminado exitosamente.', { id: loadingToast });
       setUsers(users.filter((user) => user.userId !== userId));
     } catch (error) {
       console.error("Error fetching ambulances:", error);
-      toast.error('Error al eliminar el usuario.', {id: loadingToast});
+      toast.error('Error al eliminar el usuario.', { id: loadingToast });
     }
   };
 
+  const handleEditClick = (user: User) => {
+      const serialized = encodeURIComponent(JSON.stringify(user));
+      router.push(`/dashboard/users/updateUser/${user.role}/${user.userId}?data=${serialized}`);
+  };
+
+  const handleConfirm = () => {
+    if (userToDelete) handleDelete(userToDelete.userId, userToDelete.role);
+    setIsModalOpen(false);
+  };
+
   if (loading) {
-		return (
-			<div className="flex justify-center items-center h-screen">
-				<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-customRed"></div>
-			</div>
-		);
-	}
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-customRed"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white p-4 flex">
@@ -90,6 +111,7 @@ export default function UsersPage() {
                   <th className="text-left py-3 px-4 font-medium">email</th>
                   <th className="text-left py-3 px-4 font-medium">rol</th>
                   <th className="text-left py-3 px-4 font-medium">eliminar</th>
+                  <th className="text-left py-3 px-4 font-medium">editar</th>
                 </tr>
               </thead>
 
@@ -105,11 +127,20 @@ export default function UsersPage() {
                     <td className="py-3 px-4">{user.role}</td>
                     <td className="py-3 px-4">
                       <button
-                        onClick={() => handleDelete(user.userId)}
+                        onClick={() => openModal(`Esta seguro de querer eliminar el usuario ${user.firstName} ${user.lastName}?`, user)}
                         className="p-1 hover:bg-red-50 rounded-full text-red-500 transition-colors"
                       >
                         <X className="h-4 w-4" />
-                        <span className="sr-only">Delete user</span>
+                        <span className="sr-only">Eliminar usuario</span>
+                      </button>
+                    </td> 
+                    <td className="py-3 px-4">
+                      <button
+                        onClick={() => handleEditClick(user)}
+                        className="p-1 hover:bg-red-50 rounded-full text-red-500 transition-colors"
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Editar usuario</span>
                       </button>
                     </td>
                   </tr>
@@ -126,6 +157,12 @@ export default function UsersPage() {
           </div>
         </div>
       </div>
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirm}
+        title={modalTitle} // Pasamos el título dinámico
+      />
     </div>
   );
 }
