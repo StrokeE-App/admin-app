@@ -3,6 +3,7 @@
 import apiClient from "@/api/api";
 import Button from "@/components/Button";
 import ConfirmModal from "@/components/ConfirmModal";
+import Input from "@/components/Input";
 import { useAuth } from "@/context/AuthContext";
 import { Edit, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -21,6 +22,8 @@ interface User {
 export default function UsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState(""); // Estado para el título dinámico
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
@@ -30,7 +33,7 @@ export default function UsersPage() {
   useEffect(() => {
     if (!user) return;
     const loadingToast = toast.loading("Cargando Usuarios...");
-    const fetchAmbulances = async () => {
+    const fetchUsers = async () => {
       try {
         setLoading(true);
         const response = await apiClient.get("/admin/all");
@@ -45,8 +48,20 @@ export default function UsersPage() {
       }
     };
 
-    fetchAmbulances();
+    fetchUsers();
   }, [user]);
+
+	useEffect(() => {
+		if (searchTerm.trim() === '') {
+			setFilteredUsers(users);
+		} else {
+			const filtered = users.filter(
+				(user) =>
+					user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) || user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) || user.role.toLowerCase().includes(searchTerm.toLowerCase()) 
+			);
+			setFilteredUsers(filtered);
+		}
+	}, [searchTerm, user]);
 
   const openModal = (title: string, user:User) => {
     setModalTitle(title); // Establece el título dinámico
@@ -100,6 +115,9 @@ export default function UsersPage() {
               />
             </div>
           </div>
+          <div className="mb-6 hover:scale-105 transition-transform duration-300 ease-out">
+						<Input type="text" placeholder="Buscar paciente por nombre..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+					</div>
           <div className="w-full overflow-x-auto">
             <table className="w-full border-collapse">
               {/* Table Header */}
@@ -117,7 +135,7 @@ export default function UsersPage() {
 
               {/* Table Body */}
               <tbody>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                   <tr
                     key={user.userId}
                     className="border-b hover:bg-gray-50 transition-colors"
