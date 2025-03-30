@@ -5,12 +5,54 @@ import { emergenciesList } from '@/mocks/emergency';
 
 // Components
 import EmergencyCard from '@/components/EmergencyCard';
-import { useSseContext } from '@/context/SseContext';
 import { formatDate } from '@/utils/functions';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import toast from 'react-hot-toast';
+import apiClient from '@/api/api';
+import { Emergency } from '@/types';
 //import SettingsMenu from '@/components/SettingsMenu';
 
 export default function Dashboard() {
-  const { emergencies: data, isConnected, error } = useSseContext();
+  const [data, setData] = useState<Emergency[]>([]); // State for emergency data
+  const [filteredEmergencies, setFilteredEmergencies] = useState<Emergency[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) return;
+    const loadingToast = toast.loading("Cargando Usuarios...");
+    const fetchEmergencies = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get("/emergency/all");
+        setData(response.data.data);
+        console.log(response.data.data);
+			  setFilteredEmergencies(response.data.data);
+        toast.success("Emergencias cargadas correctamente.", { id: loadingToast });
+      } catch (error) {
+        console.error("Error fetching emergencies:", error);
+        toast.error("Error al cargar las emergencias.", { id: loadingToast });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmergencies();
+  }, [user]);
+
+  useEffect(() => {
+		if (searchTerm.trim() === '') {
+			setFilteredEmergencies(data);
+		} else {
+			const filtered = data.filter(
+				(emergency) =>
+					emergency.status.toLowerCase().includes(searchTerm.toLowerCase()) || emergency.startDate.toLowerCase().includes(searchTerm.toLowerCase()) || emergency.ambulanceId.toLowerCase().includes(searchTerm.toLowerCase()) 
+			);
+			setFilteredEmergencies(filtered);
+		}
+	}, [searchTerm, user]);
 
   if (data === null) {
     return (
@@ -35,7 +77,7 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Emergencias Confirmadas
           </h1>
-          <p className="text-gray-600">No hay emergencias activas.</p>
+          <p className="text-gray-600">No hay emergencias.</p>
           {/* <div className="animate-pulse rounded-full h-32 w-32 border-t-2 border-b-2 border-customRed"></div> */}
         </div>
       </main>
@@ -54,11 +96,12 @@ export default function Dashboard() {
 
         {/* Patient Information */}
         {data.map((emergency) => {
-          let formatedTime = formatDate(emergency.startDate);
+          const formatedTime = formatDate(emergency.startDate);
+          const formatedTime2 = formatDate(emergency.deliveredDate);
         return(
         <EmergencyCard
           key={emergency.emergencyId}
-          userName={`${emergency.patient.firstName} ${emergency.patient.lastName}`}
+          userName={formatedTime2}
           emergencyTime={formatedTime}
           emergencyId={emergency.emergencyId}
           emergency={emergency}

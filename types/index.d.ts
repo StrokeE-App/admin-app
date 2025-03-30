@@ -30,6 +30,25 @@ export type EmergencyInfo = {
 	// emergencyLocation: {latitude: double; longitude: double};
 };
 
+export type Emergency = {
+  emergencyId: string;
+  activatedBy: {
+    rol: string;
+    phoneNumber: string;
+    userId: string;
+  };
+  startDate: string;
+  pickupDate: string;
+  deliveredDate: string;
+  patientId: string;
+  ambulanceId: string;
+  nihScale: null | number; // Si nihScale puede ser un número en el futuro
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  healthcenterId: string;
+};
+
 export type UserUpdateData = {
   userId: string;
   firstName: string;

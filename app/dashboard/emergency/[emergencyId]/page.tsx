@@ -10,15 +10,12 @@ const DynamicMap = dynamic(() => import("@/components/Map"), {
   ssr: false,
 });
 
-// Mocks
-import { emergency1 } from "@/mocks/emergency";
-
 // Components
 import EmergencyInfoComponent from "@/components/EmergencyInfoComponent";
-import ConfirmStrokeComponent from "@/components/ConfirmStrokeComponent";
 import { useSearchParams } from "next/navigation";
-import { useSseContext } from "@/context/SseContext";
 import toast from "react-hot-toast";
+import apiClient from "@/api/api";
+import { useAuth } from "@/context/AuthContext";
 
 export default function EmergencyClientPage({
   params,
@@ -26,46 +23,32 @@ export default function EmergencyClientPage({
   params: Promise<{ emergencyId: string }>;
 }) {
   const { emergencyId } = React.use(params); // Get emergencyId from URL
-  const searchParams = useSearchParams(); // Get URL search params
   const [emergency, setEmergency] = useState<EmergencyInfo | null>(null); // State for emergency data
-  const { emergencies } = useSseContext(); // Get emergencies from global context
   const [error, setError] = useState<Error | null>(null); // State for error handling
+  const [loading, setLoading] = useState(false);
+    const { user } = useAuth();
+  
 
   useEffect(() => {
-    const fetchEmergencyData = async () => {
-      const emergencyDataString = searchParams.get("data");
-      if (emergencyDataString) {
-        try {
-          const parsed = JSON.parse(decodeURIComponent(emergencyDataString));
-          setEmergency(parsed);
-        } catch (error) {
-          console.error("Failed to parse emergency data:", error);
-          findEmergencyInContext();
-        }
-      } else {
-        findEmergencyInContext();
+    if (!user) return;
+    const loadingToast = toast.loading("Cargando Usuarios...");
+    const fetchEmergencies = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get(`/emergency/${emergencyId}`);
+        setEmergency(response.data.data);
+        console.log(response.data.data);
+        toast.success("Emergencia cargada correctamente.", { id: loadingToast });
+      } catch (error) {
+        console.error("Error fetching emergency: ", error);
+        toast.error("Error al cargar la emergencia.", { id: loadingToast });
+      } finally {
+        setLoading(false);
       }
     };
 
-    const findEmergencyInContext = async () => {
-      // Only try to find the emergency in the global context
-      if (emergencies) {
-        const foundEmergency = emergencies.find(
-          (e) => e.emergencyId === emergencyId
-        );
-        if (foundEmergency) {
-          setEmergency(foundEmergency);
-          return;
-        } else {
-          toast.error("La emergencia no se encuentra disponible en el sistema");
-          setError(new Error("Emergencia no encontrada."));
-          console.log("Emergency not found in context:", emergencyId);
-        }
-      }
-    };
-
-    fetchEmergencyData();
-  }, [searchParams, emergencyId, emergencies]);
+    fetchEmergencies();
+  }, [user]);
 
   return (
     <div>

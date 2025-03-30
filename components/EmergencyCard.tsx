@@ -2,19 +2,17 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "./Button";
 import ConfirmModal from "./ConfirmModal";
-import { EmergencyInfo } from "@/types";
+import { Emergency, EmergencyInfo } from "@/types";
 
 interface EmergencyCardProps {
   userName: string;
-  userPhone: string;
   emergencyId: string;
   emergencyTime: string;
-  emergency: EmergencyInfo;
+  emergency: Emergency;
 }
 
 export default function EmergencyCard({
   userName,
-  userPhone,
   emergencyId,
   emergencyTime,
   emergency,
@@ -42,7 +40,6 @@ export default function EmergencyCard({
           </div>
           <div className=" flex flex-col gap-10 md:ml-10 md:flex-row md:h-2/6 md:w-2/6">
             <Button onClick={handleClick} title="Mas informacion" color="green" />
-            <Button onClick={()=>setIsModalOpen(true)} title="Cancelar proceso" color="red" />
           </div>
           <ConfirmModal
                   isOpen={isModalOpen}
