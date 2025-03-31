@@ -1,10 +1,10 @@
 "use client";
 
-import { EmergencyInfo } from "@/types";
+import { SingleEmergency } from "@/types";
 import { formatDate } from "@/utils/functions";
 
 type EmergencyInfoProps = {
-	emergency: EmergencyInfo | null;
+	emergency: SingleEmergency | null;
 };
 
 export default function EmergencyInfoComponent({emergency}: EmergencyInfoProps) {
@@ -23,21 +23,22 @@ export default function EmergencyInfoComponent({emergency}: EmergencyInfoProps) 
 		);
 	}
   const readableStartDate = formatDate(emergency.startDate);
-	const {firstName, lastName, phoneNumber, age, weight, height} = emergency.patient;
+  const readablePickUpDate = formatDate(emergency?.pickupDate);
+  const readableDeliveredDate = formatDate(emergency?.deliveredDate);
+	const {age, weight, firstName,lastName, height} = emergency.patient;
 	return (
-		<div className="w-11/12 mx-auto p-6 ">
+		<div className="w-11/12 mx-auto ">
 			<div className="text-center space-y-6">
 				<div className="pb-4">
 					<h1 className="text-2xl font-bold inline-block px-4 pb-1">
 						{firstName} {lastName}
 					</h1>
+          <h3 className="text-xl font-bold">
+            {emergency.status}
+          </h3>
 				</div>
 
 				<div className="grid grid-cols-2 gap-x-6 gap-y-6">
-					<div>
-						<h2 className="text-custom-black font-bold text-sm">Teléfono</h2>
-						<p className="text-custom-black font-medium">{phoneNumber}</p>
-					</div>
 					<div>
 						<h2 className="text-custom-black text-sm font-bold">Edad</h2>
 						<p className="text-custom-black font-medium">{age} años</p>
@@ -48,29 +49,25 @@ export default function EmergencyInfoComponent({emergency}: EmergencyInfoProps) 
 					</div>
 					<div>
 						<h2 className="text-custom-black text-sm font-bold">Estatura</h2>
-						<p className="text-custom-black font-medium">{height} m</p>
+						<p className="text-custom-black font-medium">{height} cm</p>
 					</div>
 					<div>
 						<h2 className="text-custom-black text-sm font-bold">Nivel De Stroke</h2>
 						<p className="text-custom-black font-medium">{emergency.nihScale ? emergency.nihScale : '...'}</p>
 					</div>
 					<div>
-						<h2 className="text-custom-black text-sm font-bold whitespace-wrap">Tiempo desde que inició la emergencia</h2>
+						<h2 className="text-custom-black text-sm font-bold whitespace-wrap">Fecha de inicio de la emergencia</h2>
 						<p className="text-custom-black font-medium">{readableStartDate}</p>
 					</div>
+          <div>
+						<h2 className="text-custom-black text-sm font-bold whitespace-wrap">Fecha de recepcion de paciente</h2>
+						<p className="text-custom-black font-medium">{readablePickUpDate}</p>
+					</div>
+          <div>
+						<h2 className="text-custom-black text-sm font-bold whitespace-wrap">Fecha de entrega del paciente</h2>
+						<p className="text-custom-black font-medium">{readableDeliveredDate}</p>
+					</div>
 				</div>
-        <div className="flex justify-center">
-          {emergency.patient.conditions && (
-            <div className="flex flex-col items-center">
-              <h2 className="text-custom-black text-sm font-bold">Condiciones</h2>
-              <ul className="text-custom-black font-medium">
-                {emergency.patient.conditions.map((condition, index) => (
-                  <li key={index}>{condition}</li>
-                ))}
-              </ul>
-              </div>
-            )}
-        </div>
 			</div>
 		</div>
 	);

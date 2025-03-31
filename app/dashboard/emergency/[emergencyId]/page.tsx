@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { EmergencyInfo } from "@/types";
+import { EmergencyInfo, SingleEmergency } from "@/types";
 import { ArrowBigLeft } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -12,7 +12,7 @@ const DynamicMap = dynamic(() => import("@/components/Map"), {
 
 // Components
 import EmergencyInfoComponent from "@/components/EmergencyInfoComponent";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import toast from "react-hot-toast";
 import apiClient from "@/api/api";
 import { useAuth } from "@/context/AuthContext";
@@ -22,16 +22,16 @@ export default function EmergencyClientPage({
 }: {
   params: Promise<{ emergencyId: string }>;
 }) {
-  const { emergencyId } = React.use(params); // Get emergencyId from URL
-  const [emergency, setEmergency] = useState<EmergencyInfo | null>(null); // State for emergency data
+  const { emergencyId } = useParams() // Get emergencyId from URL
+  const [emergency, setEmergency] = useState<SingleEmergency | null>(null); // State for emergency data
   const [error, setError] = useState<Error | null>(null); // State for error handling
   const [loading, setLoading] = useState(false);
-    const { user } = useAuth();
-  
+  const { user } = useAuth();
+
 
   useEffect(() => {
     if (!user) return;
-    const loadingToast = toast.loading("Cargando Usuarios...");
+    const loadingToast = toast.loading("Cargando Emergencia...");
     const fetchEmergencies = async () => {
       try {
         setLoading(true);
@@ -42,6 +42,7 @@ export default function EmergencyClientPage({
       } catch (error) {
         console.error("Error fetching emergency: ", error);
         toast.error("Error al cargar la emergencia.", { id: loadingToast });
+        setError(error as Error); // Set error state
       } finally {
         setLoading(false);
       }
@@ -51,53 +52,56 @@ export default function EmergencyClientPage({
   }, [user]);
 
   return (
-    <div>
-      <div className="text-customRed mt-4 ml-4">
-        <Link href="/dashboard">
-          <ArrowBigLeft size={48} />
-        </Link>
-      </div>
-      {error && (
-        <>
-          <div className="w-11/12 mx-auto p-6 ">
-            <div className="text-center space-y-6">
-              <div className="pb-4">
-                <h1 className="text-2xl font-bold inline-block px-4 pb-1">
-                  {error.message}
-                </h1>
+    <main className="min-h-screen bg-white p-4 flex">
+      <div className="hidden w-1/6 container md:inline"></div>
+      <div className="mt-20 px-4 flex flex-col items-start ml-10 grow">
+        <div className="text-customRed mt-4 ml-4">
+          <Link href="/dashboard">
+            <ArrowBigLeft size={48} />
+          </Link>
+        </div>
+        {error && (
+          <>
+            <div className="w-11/12 mx-auto p-6 ">
+              <div className="text-center space-y-6">
+                <div className="pb-4">
+                  <h1 className="text-2xl font-bold inline-block px-4 pb-1">
+                    {error.message}
+                  </h1>
+                </div>
               </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
 
-      {!emergency && !error && (
-        <>
-          <div className="w-11/12 mx-auto p-6 ">
-            <div className="text-center space-y-6">
-              <div className="pb-4">
-                <h1 className="text-2xl font-bold inline-block px-4 pb-1">
-                  Cargando...
-                </h1>
+        {!emergency && !error && (
+          <>
+            <div className="w-11/12 mx-auto p-6 ">
+              <div className="text-center space-y-6">
+                <div className="pb-4">
+                  <h1 className="text-2xl font-bold inline-block px-4 pb-1">
+                    Cargando...
+                  </h1>
+                </div>
               </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
 
-      {emergency && (
-        <>
-          {" "}
-          <EmergencyInfoComponent emergency={emergency} />
-          {/* <DynamicMap
+        {emergency && (
+          <>
+            {" "}
+            <EmergencyInfoComponent emergency={emergency} />
+            {/* <DynamicMap
         latitude={emergency ? emergency.emergencyLocation.latitude : 3.382325}
         longitude={
           emergency ? emergency.emergencyLocation.longitude : -76.528043
         }
       /> */}
-          {/* <ConfirmStrokeComponent emergencyId={emergencyId} /> */}
-        </>
-      )}
-    </div>
+            {/* <ConfirmStrokeComponent emergencyId={emergencyId} /> */}
+          </>
+        )}
+      </div>
+    </main>
   );
 }

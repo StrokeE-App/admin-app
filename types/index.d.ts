@@ -30,6 +30,23 @@ export type EmergencyInfo = {
 	// emergencyLocation: {latitude: double; longitude: double};
 };
 
+type SingleEmergency = {
+  emergencyId: string;
+  startDate: string;
+  pickupDate: string;
+  deliveredDate: string;
+  nihScale: number;
+  status: string;
+  patient: {
+    age: number;
+    firstName: string;
+    height: number;
+    lastName: string;
+    phoneNumber: string;
+    weight: number;
+  };
+};
+
 export type Emergency = {
   emergencyId: string;
   activatedBy: {
