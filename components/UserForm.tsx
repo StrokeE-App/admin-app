@@ -80,6 +80,7 @@ export function UserForm() {
         password: password,
         ambulanceId: plate,
       };
+
     } else if (rol === "healthCenter") {
       user = {
         firstName: userName,
