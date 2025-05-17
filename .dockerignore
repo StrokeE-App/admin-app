@@ -1,5 +1,4 @@
 # .dockerignore
-.env.local
 node_modules
 .next
 *.log
